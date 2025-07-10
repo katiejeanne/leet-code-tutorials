@@ -1,0 +1,122 @@
+# Using two pointers and a prefix sum to find K radius subarray averages
+
+_Using JavaScript to solve [LeetCode #2090](https://leetcode.com/problems/k-radius-subarray-averages/)_
+
+This tutorial will guide you through how to solve LeetCode problem 2090 using JavaScript.
+
+This solution uses a two pointer approach combined with a prefix sum, which is common for problems that ask for rolling calculations over a range of values.
+
+Careful index managment is also essential, since we will need to track the start, end, and center of each subarray.
+
+## Understanding the problem
+
+From [LeetCode](https://leetcode.com/problems/k-radius-subarray-averages/):
+
+> Build and return an array avgs of length n where avgs[i] is the k-radius average for the subarray centered at index i.
+
+For each position in the array we will see if we can create a subarray with a radius of k. If we can't, the result at that position will be -1. If we can, we will enter the average of the subarray we created.
+
+Before we move on to the solution, let's look at what it means to have a k-radius subarray. We'll also look closer at how this problem wants us to caculate averages.
+
+### K-radius subarray
+
+A k-radius subarray is an array that extends for k positions to both the left and the right of a given index.
+
+Let's look at the example array [7, 4, 3, 9, 1, 8, 5, 2, 6], shown below. A subarray **centered on index 2 with a k-radius of 1** would comprise index 1 through index 3:
+
+| Values | 7   | [ _4_ | _3_ | _9_ ] | 1   | 8   |
+| ------ | --- | ----- | --- | ----- | --- | --- |
+| Index  | 0   | [ _1_ | _2_ | _3_ ] | 4   | 5   |
+|        |     | ↑     | ◉   | ↑     |
+
+Similarly, a **subarray centered on index 2 with k-radius of 2** would comprise index 0 through index 4.
+
+| Values | [ _7_ | _4_ | _3_ | _9_ | _1_ ] | 8   |
+| ------ | ----- | --- | --- | --- | ----- | --- |
+| Index  | [ _0_ | _1_ | _2_ | _3_ | _4_ ] | 5   |
+|        | ↑     | ↑   | ◉   | ↑   | ↑     |
+
+However, there are many positions where a valid subarray cannot be created. When this happens, we'll return a -1 instead of an average.
+
+For example, with a k of 2, we could not create a valid subarray centered on index 0. There is no room to extend k values to the left of 0.
+
+| Values | --  | --  | _7_ | _4_ | _3_ | _9_ | 1   | 8   |
+| ------ | --- | --- | --- | --- | --- | --- | --- | --- |
+| Index  | --  | --  | _0_ | _1_ | _2_ | _3_ | 4   | 5   |
+|        | ↑   | ↑   | ◉   | ↑   | ↑   |
+
+Only valid subarrays, where we can extend k values to both the left and right, should return an average.
+
+### Average with Integer Division
+
+The problem asks us to find the average using integer division.
+
+From [LeetCode](https://leetcode.com/problems/k-radius-subarray-averages/):
+
+> The average of x elements is the sum of the x elements divided by x, using integer division. The integer division truncates toward zero, which means losing its fractional part.
+
+While some languages like Python and Java have a version of integer division built in, to find the same result in JavaScript we'll need to use either Math.trunc or Math.floor.
+
+- **Math.trunc** discards any fractional part of a number, moving the value closer to 0. For a negative number like -4.2, Math.trunc will return -4. This matches integer division behavior in most languages, such as Java, C++, and Go.
+
+- **Math.floor** rounds the number down to the next smaller integer. For a negative number like -4.2, Math.floor will return -5. This matches how Python's // operator works.
+
+Here, the problem states that we should truncate towards 0, which means Math.trunc is the more accurate choice.
+
+However, the difference between the two _only appears when dealing with negative numbers_. You can see in the constraints for this problem that all values are guaranteed to be positive.
+
+> Constraints:
+>
+> n == nums.length  
+> 1 <= n <= 105  
+> **0 <= nums[i]**, k <= 105
+
+For this problem, either Math.trunc or Math.floor will give us the average we need to assemble a passing solution.
+
+## The Solution
+
+Now that we've explored the problem in depth, we can start coding our solution.
+
+# Set up the answer array
+
+Before we start calculating averages, we need a place to store them, so we'll start by creating a results arra.
+
+We know that we need to return a number for every position in the provided array, so we'll make our results array the same size.
+
+It's simple to get the size of any array using .length, but we will be using the size of the original array multiple times throughout our code, so we'll go ahead and store that number in the variable n to make it easier to reference. This also matches the problem description's use of the variable n.
+
+We can then use n to make our results array the same size as the original array.
+
+```javascript
+const n = nums.length;
+const result = new Array(n);
+```
+
+# Look only at valid subarrays
+
+We know that we will only need to calculate the averages of the valid subarrays - subarrays that can extend k positions to both the left and right.
+
+We could traverse the array and check if each subarray is valid before storing our result, but that means we'll be performing unnecessary iterations that don't yield any results. It also means adding additional code in our loop to check if each subarray is valid before calculating the average. That's a lot of extra calculation that isn't necessarily needed.
+
+Finding which arrays are valid is simple - we know that the first valid subarray will be centered at k index and the last valid subarray will be centered at n - k.
+
+This means it is easy for us to only look at those arrays that produce a valid subarray.
+
+What, then, about those positions without a valid subarray? If we prefill our result array with -1 at each position, then those positions without a valid subarray will correctly return a -1 without any additional code.
+
+For valid subarrays, we'll replace the -1 with the average as we calculate it.
+
+For now, let's add the code to prefill our result array with -1 at each position.
+
+```javascript
+const n = nums.length;
+const result = new Array(n).fill(-1);
+```
+
+# Set up the first valid subarray
+
+# Iterate through the valid subarrays, find average at each
+
+# Return the answer
+
+## The complete code solution
