@@ -2,6 +2,8 @@
 
 _Using JavaScript to solve [LeetCode #2090](https://leetcode.com/problems/k-radius-subarray-averages/)_
 
+Also published on [Medium](https://medium.com/@kjeanne_32239/interview-prep-using-two-pointers-and-a-rolling-sum-to-find-k-radius-subarray-averages-a9154d2aa113)
+
 This tutorial will guide you through how to solve LeetCode problem 2090 using JavaScript. It's aimed at developers who are familiar with JavaScript basics but new to algorithm practice problems.
 
 This solution uses a two-pointer sliding window approach combined with a rolling sum, which is a memory-efficient variation of the prefix sum technique. This combination of strategies is often used with problems that involve rolling calculations over a set of values.

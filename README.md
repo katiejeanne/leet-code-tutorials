@@ -1,9 +1,12 @@
 # LeetCode Tutorials
 
-This repository contains in-progress tutorials designed to teach not just how to solve LeetCode problems, but how to think through them step by step.  
+This repository contains in-progress tutorials designed to teach not just how to solve LeetCode problems, but how to think through them step by step.
+
 The goal is to highlight the reasoning behind each solution and help build transferable problem-solving skills.
 
-Right now, this is a work in progress—but it's a space for me to grow and share as I go.
+## Published Tutorials
+
+- [Using two pointers and a rolling sum to find K radius subarray averages - LeetCode 2090](https://medium.com/@kjeanne_32239/interview-prep-using-two-pointers-and-a-rolling-sum-to-find-k-radius-subarray-averages-a9154d2aa113)
 
 ---
 
