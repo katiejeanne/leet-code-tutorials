@@ -10,20 +10,47 @@ This tutorial will demonstrate how to navigate around a grid programmatically, t
 
 ## Understand the problem
 
-This section breaks down the problem into smaller pieces and teaches how to approach each piece. If you've already worked through some graph problems before this may feel overly simple to you. Feel free to skim or skip this section if you don't think you need it - we won't start building the actual solution until the next section. If you are new to graph problems, however, hopefully this gives you an understanding of how to get started.
+This is one of the most popular graph problems on LeetCode - and one of the most disorienting the first time you try it. Why? Because it forces you to turn a visual, intuitive task into a step-by-step set of instructions a computer can follow.
 
-For you, a human, counting the islands on a map is most likely very simple - you just look at the map and count. This is because you already understand what an island is, the difference between how land and water appear on a map, and you know how to count. You might need to set down some ground rules about what counts as an island, but once you have that down the task is most likely trivial. If there are more islands to count than you can keep easily in your head you probably have some trick for keeping track of which islands you have already counted.
+For you, a human being, counting islands on a map is trivial - you just look at the map and count. You already have a mental model of how maps work, what islands are (and are not), and what it means to "count."
 
-A computer, however, doesn't know any of this. It can count, but it doesn't know what to count or when to stop, and it doesn't have a sense of what is has already counted. Part of what makes graph problems so challenging is you are taking information that you already know, such as the concept of an island, and figuring out how to represent it in code.
+Your program knows none of that. In order to count the islands on this map you'll have to figure out how to get your program to do all of the following:
 
-In the remainder of this section we'll look at a series of questions that should help you understand how to communicate the necessary information in code.
+- Move through the grid in a logical way
+- Distinguish between land, water, and the edge of the map.
+- Track which cells have already been analyzed.
+- Identify land cells that are connected to each other.
+- Identify land cells that make a distinct island.
+- Count all the islands without any repeats.
 
-- How do we tell if two land cells are next to each other?
-- How do we know if we have already looked at a particular cell?
-- How do we count a group of connected cells as a single island?
-- How do we count all the islands without counting an island more than once?
-- How do we know when we are encountering a new island?
-- How do we count the islands we have found?
+Possible edit:
+Scan every cell in the grid.
+Systematically check each cell to find potential new islands.
+
+Recognize land vs. water.
+Only land (1) is part of an island—everything else is water (0).
+
+When land is found, traverse outward to explore the full island.
+Use a graph traversal strategy (DFS or BFS) to move from cell to cell.
+
+Handle movement carefully—don’t go off the map.
+During traversal, avoid checking out-of-bounds neighbors.
+
+Track which cells have already been visited.
+Prevent revisiting cells so you don’t double-count or enter infinite loops.
+
+Count each island only once.
+After fully exploring one island, increase the island count.
+
+Below you can find a grid that represents a typical input for the _Number of Islands_ problem.
+
+| 0   |     | 0   |     | 0   |
+| --- | --- | --- | --- | --- |
+| 0   |     |     |     |     |
+
+|
+
+The obvious way of moving cell to cell is to look at each cell in order.
 
 ## Traveling across the map
 
