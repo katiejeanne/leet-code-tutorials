@@ -4,9 +4,7 @@ _The following tutorial is currently in progress. Come back soon to see the fina
 
 This tutorial demonstrates a typical solution to LeetCode 200, _Number of Islands_, using JavaScript. This tutorial is aimed at developers who are familiar with the basics of JavaScript but less experienced with LeetCode style problems.
 
-A graph problem looks at a set of nodes and their connections, known as a graph, and analyzes that structure to answer the given question.
-
-In _Number of Islands_, the graph takes the form of a 2-dimensional array where `1`s represent land and `0`s represent water. When multiple land cells are directly adjacent to each other they are considered part of the same island. The problem asks us to count the number of islands in the graph.
+In _Number of Islands_, the problem presents a graph in the form of a 2-dimensional array where `1`s represent land and `0`s represent water. When multiple land cells are directly adjacent to each other they are considered part of the same island. The problem asks us to count the number of islands in the graph.
 
 This tutorial will demonstrate how to navigate around a grid programmatically, track visited cells, and maintain a count of islands identified along the way. We will also write a Depth-First Search (DFS) function to help us group land cells into islands. In the end, we'll have created a solution that uses DFS to count each island in the provided grid.
 
@@ -20,24 +18,22 @@ In problems like this you need to break down your process into a series of steps
 
 - Look at every cell in the grid
 - Recognize a land cell (versus a water cell)
-- Find all the land cells that belong in an island
+- Find all the land cells in a given island
 - Track which cells have already been visited
 - Count each island only once
 
 ## Step one: Look at every cell in the grid
 
-At this point you may not have a clear picture yet of how to accomplish all of these steps. That's fine. For now we'll start with the most basic step: looking at each individual cell.
+Let's start with the most basic step: looking at each individual cell.
 
-Writing a loop that looks at every cell is fairly straightforward. Once we have the dimensions of the grid we can use that information to write a for loop that will look at each cell.
-
-The input we receive is a 2-dimensional array, or an array of arrays. We can find its dimensions by looking at the length of the top level array, and the length of the first row.
+We can move through the cells one by one using the dimensions of the grid. We can find its dimensions by looking at the length of the top level array, and then the length of the first row.
 
 ```javascript
 const numRows = grid.length;
 const numCols = grid[0].length;
 ```
 
-We can then use the dimensions of the grid to write a loop that looks at each individual cell.
+Now we'll write a loop that move through each row, looking at every cell in that row.
 
 ```javascript
 for (let row = 0; row < numRows; row++) {
@@ -49,7 +45,7 @@ for (let row = 0; row < numRows; row++) {
 
 ## Step two: Recognize land versus water
 
-A simple check of the cell's contents will help us identify land cells for further processing. If the cell contains `0`, we can ignore it. If the cell contains `1`, we proceed to the next step.
+If the cell contains `0`, we can ignore it. If the cell contains `1`, we proceed to the next step.
 
 ```javascript
 for (let row = 0; row < numRows; row++) {
@@ -63,11 +59,9 @@ for (let row = 0; row < numRows; row++) {
 
 ## Step three: Find all the land cells that belong to an island
 
-Once we have identified a land cell, we'll want to look at all the connected cells to see if they are part of the current island.
+Once we have identified a land cell, we'll want to look at all the connected cells to see if there are any additional land cells that should be counted as part of the current island.
 
-Remember, we are counting islands, not land cells. This means we will eventually want to increase our island count only if we know that the current land cell is an entirely new island and not simply a land cell connected to an existing island.
-
-First, let's separate out this part of the process into a separate function. This will help make the code easier to follow.
+First, let's separate out this part of the process into a separate function. This helps clean up our code and will come in handy later.
 
 ```javascript
 const exploreIsland = function (currRow, currCol) {
@@ -86,11 +80,13 @@ for (let row = 0; row < numRows; row++) {
 
 ### Step 3.1: Visit all adjacent cells
 
-At this point we want to look only at the cells that are connected to the current cell. From the problem description we know that we only need to look at the cells to the left and to the right, as well as the cells above and below.
+At this point we want to look only at the cells that are connected to the current cell. The problem defines what cells are connected.
 
 > An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. `
 
 Note that we don't need to worry about cells connected diagonally.
+
+We will want to look at each of the four connected cells and determine if each cell is land or water.
 
 The following diagram shows the four cells we would need to look at if we start from row 1, column 1.
 
@@ -100,9 +96,7 @@ The following diagram shows the four cells we would need to look at if we start 
 | 1   | ◯   | ◎   | ◯   |
 | 2   |     | ◯   |     |
 
-What we need is a pattern we can use to find the adjacent coordinates for _any_ cell we visit.
-
-To do this, let's look at the changes we need to make to the above starting coordinates to find the adjacent cells of (1, 1).
+The changes we need to make to our current coordinates to reach each connected cell is as follows:
 
 - We add 1 to the row to get to (2, 1)
 - We subtract 1 from the row to get to (0, 1)
@@ -120,7 +114,7 @@ We can represent these changes in an array like so:
 ];
 ```
 
-Now we can write a loop that will look at each of the adjacent cells:
+With these changes laid out, we can now write a loop that will look at each connected cell for any cell that we visit.
 
 ```javascript
 const adjCoords = [
@@ -138,8 +132,6 @@ const exploreIsland = function (currRow, currCol) {
   }
 };
 ```
-
-Now we have all the code we need to look at the adjacent cells from our starting cell.
 
 ## Step three part two: Make sure we don't leave the grid
 
@@ -159,7 +151,7 @@ In order to prevent errors from trying to look at cells outside the grid, we can
 
 I'll create a helper function `isValid` then use it within the loop.
 
-For convenience, I'll also check to make sure the next cell is a land cell instead of a water cell.
+For convenience, I'll also use this function to check if the next cell is a land cell instead of a water cell.
 
 ```javascript
 const isValid = function (row, col) {
@@ -192,9 +184,9 @@ const exploreIsland = function (currRow, currCol) {
 
 ## Step Three Part Three: Explore the next land cell
 
-At this point let's say we have looked at the adjacent cells and found that one is a valid land cell. What do we next?
+At this point let's say we have looked at the adjacent cells and found that one is a valid land cell. What do we do next?
 
-We want to find all the connected land cells, so we need to keep going until we have found every cell, which means repeating the whole process with the next cell.
+There may be additional land cells connected to this new cell. This means we'll want to run all the same tests on this new land cell just like we did with the current one.
 
 We can do that by calling the exploreIsland function again using recursion.
 
@@ -210,19 +202,27 @@ const exploreIsland = function (currRow, currCol) {
 };
 ```
 
-Now exploreIsland will continue to call itself on each new land cell until it runs out of land cells.
+// Do I need to go more into depth on recursion?
 
-// Determine how in depth to explain recursion, and to what degree to lead into next step.
+Now exploreIsland will continue to call itself on each new land cell until it runs out of land cells... or will it?
 
 ## Step four: Track visited cells
 
-If you tried to run the exploreIsland function after our last step you may have discovered that it gives a Time Exceeded error.
+If you tried to run the exploreIsland function after our last step you may have discovered that it gives a `Time Exceeded` error.
 
-The issue with the above code is that the loop continually explores all the land cells connected to the current cell, without regard to what cells have already been visited.
+This is because we don't have any way to track which cells have already been visited.
 
-Let's say you have an island with exactly two connected cells. The exploreIsland function will continually jump back and forth between the two cells forever because there is nothing to tell the loop when to stop.
+Let's say you have an island with exactly two connected cells like this:
 
-At this point we will want to create a separate grid that will allow us to track which cells have already been visited. We'll make a copy of the grid and set the value of each cell to `false` initially.
+|     | 0   | 1   | 2   |
+| --- | --- | --- | --- |
+| 0   |     |     |     |
+| 1   |     | ◎   | ◎   |
+| 2   |     |     |     |
+
+The exploreIsland function will continually jump back and forth between the two cells forever because there is nothing to tell the loop that we already found the other cell.
+
+To track the visited cells, we'll make a copy of the grid to record the state of each cell. Cells that we haven't visited yet will be labeled as false. Then, each time we encounter a new cell we will mark it as true.
 
 ```javascript
 const seen = new Array(numRows);
@@ -231,13 +231,17 @@ for (let i = 0; i < numRows; i++) {
 }
 ```
 
-You may be tempted to use .fill() on the top level with the new Array syntax to represent columns. The problem with this is only one new Array is created, and every row of the seen grid is a reference to the single new array. This can be a particularly annoying bug to figure out, but it's easy to avoid by creating a new array for each row.
+// Do I explain that some people just modify the original grid?
+
+Now, when you create your grid you may feel tempted to use the following syntax:
 
 ```javascript
-const seen = new Array(numRows).fill(new Array(numCols).fill(false)); // Don't do this
+const seen = new Array(numRows).fill(new Array(numCols).fill(false)); // Don't do this!!!
 ```
 
-With our seen grid created we can now add a check to the isValid helper function.
+The problem here is that when we try to fill our top array using `.fill(newArray(...))` we only actually create a single new array. Each row becomes a repeated reference back to this single new array instead of a separate new array. When you edit a cell in this grid it will appear to change the whole column at once. This can create some tricky bugs, but it's easily avoided if you make sure a separate new array is created for each row.
+
+With our seen grid created we can now add a check to the isValid helper function to make sure the next cell hasn't already been seen.
 
 ```javascript
 const isValid = function (row, col) {
@@ -252,7 +256,23 @@ const isValid = function (row, col) {
 };
 ```
 
-Now each time we visit a new cell we'll mark it as seen. We'll do this both in our core loop and in our exploreIsland function.
+Now that we can track the state of each cell, each time we visit one we need to mark it as seen. We'll do this both in our core loop and in our exploreIsland function.
+
+In the core loop we'll check first if a cell is seen. If it isn't seen, we'll mark it as seen before we call exploreIsland.
+
+```javascript
+for (let row = 0; row < numRows; row++) {
+  for (let col = 0; col < numCols; col++) {
+    if (grid[row][col] === 1 && seen[row][col] === false) {
+      seen[row][col] = true;
+      exploreIsland(row, col);
+      // Code for counting islands
+    }
+  }
+}
+```
+
+And in the exploreIsland function:
 
 ```javascript
 const exploreIsland = function (currRow, currCol) {
@@ -311,3 +331,9 @@ for (let row = 0; row < numRows; row++) {
   }
 }
 ```
+
+Step Five:
+
+At this point we have done a lot. We have:
+
+- Written a loop that will look at every cell
