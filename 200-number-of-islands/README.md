@@ -1,8 +1,8 @@
 _The following tutorial is currently in progress. Come back soon to see the final result._
 
-# An introduction to graph problems with LeetCode 200 - Number of Islands
+# Solving a simple graph problem with LeetCode 200 - Number of Islands
 
-This tutorial demonstrates a typical solution to LeetCode 200, _Number of Islands_, using JavaScript. This tutorial is aimed at developers who are familiar with the basics of JavaScript but less experienced with LeetCode style problems.
+Welcome to LeetCode #200! This tutorial demonstrates a typical solution to LeetCode 200, _Number of Islands_, using JavaScript. This tutorial is aimed at developers who are familiar with the basics of JavaScript but less experienced with algorithm problems.
 
 In _Number of Islands_, the problem presents a graph in the form of a 2-dimensional array where `1`s represent land and `0`s represent water. When multiple land cells are directly adjacent to each other they are considered part of the same island. The problem asks us to count the number of islands in the graph.
 
@@ -220,26 +220,27 @@ Let's say you have an island with exactly two connected cells like this:
 | 1   |     | ◎   | ◎   |
 | 2   |     |     |     |
 
-The exploreIsland function will continually jump back and forth between the two cells forever because there is nothing to tell the loop that we already found the other cell.
+First, exploreIslands() visits (1, 1) and finds a land cell at (1, 2). Then, when exploreIslands() visits (1, 2) it finds the original land cell at (1, 1). The exploreIsland function will continually jump back and forth between the two cells forever because there is nothing to tell the loop that we already found the other cell.
 
-To track the visited cells, we'll make a copy of the grid to record the state of each cell. Cells that we haven't visited yet will be labeled as false. Then, each time we encounter a new cell we will mark it as true.
+To record the state of each cell--whether it has been seen or unseen--we will create a copy of the grid using a second 2-dimensional array. Cells that we haven't seen yet will be labeled as false. When we visit a land cell we'll mark the corresponding cell in our seen grid as `true`.
+
+When you create your grid you may feel tempted to use the following syntax:
+
+```javascript
+const seen = new Array(numRows).fill(new Array(numCols).fill(false));
+// Don't do this!!!
+```
+
+When you try to fill our top array using `.fill(newArray(...))` it only creates a single new array. Each row becomes a repeated reference back to this single new array, giving you x references back to a single array instead of x arrays. This can create some tricky bugs, but it's easily avoided by creating a separate new array for each row.
+
+The simplest way to do this is by using a for loop instead of the .fill() command.
 
 ```javascript
 const seen = new Array(numRows);
 for (let i = 0; i < numRows; i++) {
-  seen[i] = new Array(numCols).fill(false);
+  seen[i] = new Array(numCols).fill(false); // This creates a new array for each row
 }
 ```
-
-// Do I explain that some people just modify the original grid?
-
-Now, when you create your grid you may feel tempted to use the following syntax:
-
-```javascript
-const seen = new Array(numRows).fill(new Array(numCols).fill(false)); // Don't do this!!!
-```
-
-The problem here is that when we try to fill our top array using `.fill(newArray(...))` we only actually create a single new array. Each row becomes a repeated reference back to this single new array instead of a separate new array. When you edit a cell in this grid it will appear to change the whole column at once. This can create some tricky bugs, but it's easily avoided if you make sure a separate new array is created for each row.
 
 With our seen grid created we can now add a check to the isValid helper function to make sure the next cell hasn't already been seen.
 
@@ -272,7 +273,7 @@ for (let row = 0; row < numRows; row++) {
 }
 ```
 
-And in the exploreIsland function:
+In the exploreIsland function we already check inside the isValid function if the next cell is seen, so we only need to add a command to mark the next cell as seen.
 
 ```javascript
 const exploreIsland = function (currRow, currCol) {
@@ -323,7 +324,7 @@ const exploreIsland = function (currRow, currCol) {
 
 for (let row = 0; row < numRows; row++) {
   for (let col = 0; col < numCols; col++) {
-    if (grid[row][col] === 1) {
+    if (grid[row][col] === 1 && seen[row][col] === false) {
       seen[row][col] = true;
       exploreIsland(row, col);
       // Code for counting islands
@@ -332,8 +333,87 @@ for (let row = 0; row < numRows; row++) {
 }
 ```
 
-Step Five:
+Step Five: Count each island only once
 
 At this point we have done a lot. We have:
 
-- Written a loop that will look at every cell
+- Written a loop that will look at every cell one by one
+- Written a DFS function that will find every cell in an island
+- Created a seen grid that tracks cells that have been visited.
+
+The last step that remains is counting each island only once.
+
+Back in our original loop we are already looking at each cell, checking if it has been seen, then exploring the entire island when a new land cell is found. Each time we visit an island we are marking every land cell in that island as seen.
+
+Therefore, when our original loop finds a new unseen land cell, we can increase our island count by 1. The exploreIsland function will then go and mark every land cell in the island as seen without affecting our island count.
+
+Let's add the count to our original loop.
+
+```javascript
+let numIslands = 0;
+
+for (let row = 0; row < numRows; row++) {
+  for (let col = 0; col < numCols; col++) {
+    if (grid[row][col] === 1 && seen[row][col] === false) {
+      seen[row][col] = true;
+      numIslands++;
+      exploreIsland(row, col);
+    }
+  }
+}
+```
+
+Step Six: Return the result
+
+That's it! We have successfully counted every island present in the graph. The last step, and, if you're like me, the easiest to forget, is returning the result.
+
+Here's the entire solution, including the return at the end.
+
+```javascript
+const isValid = function (row, col) {
+  return (
+    row >= 0 &&
+    row < numRows &&
+    col >= 0 &&
+    col < numCols &&
+    grid[row][col] === 1 &&
+    seen[row][col] === false
+  );
+};
+
+const adjCoords = [
+  [-1, 0],
+  [0, -1],
+  [0, 1],
+  [1, 0],
+];
+
+const exploreIsland = function (currRow, currCol) {
+  for (const [rowChange, colChange] of adjCoords) {
+    let nextRow = currRow + rowChange;
+    let nextCol = currCol + colChange;
+    if (isValid(nextRow, nextCol)) {
+      seen[nextRow][nextCol] = true;
+      exploreIsland(nextRow, nextCol);
+    }
+  }
+};
+
+let numIslands = 0;
+
+for (let row = 0; row < numRows; row++) {
+  for (let col = 0; col < numCols; col++) {
+    if (grid[row][col] === 1 && seen[row][col] === false) {
+      seen[row][col] = true;
+      numIslands++;
+      exploreIsland(row, col);
+    }
+  }
+}
+
+return numIslands;
+```
+
+Thanks so much for working through this tutorial with me. Hopefully now you have a better sense of how to approach a simple graph problem like this one.
+
+If there's another problem you'd like to see me write up, possibly a more advanced graph problem, leave it in the comments.
